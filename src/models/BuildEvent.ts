@@ -23,6 +23,7 @@ export interface IBuildEvent extends Document {
     ipAddress?: string;
     userAgent?: string;
   };
+  expiresAt?: Date;
 }
 
 const BuildEventSchema: Schema = new Schema({
@@ -48,6 +49,10 @@ const BuildEventSchema: Schema = new Schema({
     ipAddress: { type: String },
     userAgent: { type: String },
   },
+  expiresAt: { type: Date, required: true, default: function() {
+    // Expira em 25 horas (90000 segundos)
+    return new Date(Date.now() + 25 * 60 * 60 * 1000);
+  }},
 }, {
   timestamps: true,
 });
@@ -59,5 +64,8 @@ BuildEventSchema.index({ projectId: 1 });
 BuildEventSchema.index({ deploymentId: 1 });
 BuildEventSchema.index({ status: 1 });
 BuildEventSchema.index({ 'meta.teamId': 1 });
+
+// TTL Index para expiração automática após 25 horas
+BuildEventSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export default mongoose.models.BuildEvent || mongoose.model<IBuildEvent>('BuildEvent', BuildEventSchema); 
