@@ -147,7 +147,7 @@ export default function Dashboard() {
         <StatsGrid stats={stats} />
 
         {/* Filtros */}
-        <EventFilters onFiltersChange={handleFiltersChange} />
+        {/* <EventFilters onFiltersChange={handleFiltersChange} /> */}
 
         {/* Lista de Eventos */}
         <div className="bg-white border rounded-lg">
