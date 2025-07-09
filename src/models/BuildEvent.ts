@@ -39,7 +39,6 @@ const BuildEventSchema: Schema = new Schema({
 });
 
 // Índices para melhor performance
-BuildEventSchema.index({ eventId: 1 });
 BuildEventSchema.index({ type: 1 });
 BuildEventSchema.index({ createdAt: -1 });
 BuildEventSchema.index({ projectId: 1 });
