@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import EventCard from '@/components/EventCard';
-import EventFilters from '@/components/EventFilters';
+// import EventFilters from '@/components/EventFilters';
 import { StatsGrid } from '@/components/StatsCard';
 import { RefreshCw, AlertCircle } from 'lucide-react';
 
