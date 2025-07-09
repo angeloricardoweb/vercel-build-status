@@ -43,14 +43,14 @@ export default function Dashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filters, setFilters] = useState<{
-    type?: string;
-    status?: string;
-    startDate?: string;
-    endDate?: string;
-  }>({});
+  // const [filters, setFilters] = useState<{
+  //   type?: string;
+  //   status?: string;
+  //   startDate?: string;
+  //   endDate?: string;
+  // }>({});
 
-  const fetchEvents = async (page = 1, newFilters = filters) => {
+  const fetchEvents = async (page = 1) => {
     try {
       setLoading(true);
       setError(null);
@@ -58,17 +58,16 @@ export default function Dashboard() {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '20',
-        ...newFilters,
       });
 
       const response = await fetch(`/api/events?${params}`);
-      
+
       if (!response.ok) {
         throw new Error('Erro ao carregar eventos');
       }
 
       const data: ApiResponse = await response.json();
-      
+
       setEvents(data.events);
       setStats(data.stats);
       setPagination(data.pagination);
@@ -81,19 +80,19 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchEvents();
-  }, [filters]);
+  }, []);
 
-  const handleFiltersChange = (newFilters: typeof filters) => {
-    setFilters(newFilters);
-    fetchEvents(1, newFilters);
-  };
+  // const handleFiltersChange = (newFilters: typeof filters) => {
+  //   setFilters(newFilters);
+  //   fetchEvents(1, newFilters);
+  // };
 
   const handlePageChange = (newPage: number) => {
-    fetchEvents(newPage, filters);
+    fetchEvents(newPage);
   };
 
   const handleRefresh = () => {
-    fetchEvents(pagination.page, filters);
+    fetchEvents(pagination.page);
   };
 
   if (error) {
