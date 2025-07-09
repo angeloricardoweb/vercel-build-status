@@ -25,6 +25,14 @@ interface EventCardProps {
       projectName?: string;
       deploymentUrl?: string;
     };
+    payload?: {
+      deployment?: {
+        meta?: {
+          githubCommitMessage?: string;
+          githubCommitAuthorName?: string;
+        };
+      };
+    };
   };
 }
 
@@ -93,7 +101,6 @@ const getEventTitle = (type: string) => {
 
 export default function EventCard({ event }: EventCardProps) {
   const formattedDate = format(new Date(event.createdAt), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR });
-  
   return (
     <div className={`border rounded-lg p-4 ${getEventColor(event.type)}`}>
       <div className="flex items-start justify-between">
@@ -128,6 +135,19 @@ export default function EventCard({ event }: EventCardProps) {
           <span className="font-medium">Deploy ID:</span> {event.deploymentId}
         </div>
       )} */}
+
+      {/* commit */}
+      
+      {/* {event?.payload?.deployment?.meta?.githubCommitAuthorName && (
+        <div className="mt-3 text-sm text-gray-600">
+          <span className="font-medium">Usuário:</span> {event.payload.deployment.meta.githubCommitAuthorName}
+        </div>
+      )} */}
+      {event?.payload?.deployment?.meta?.githubCommitMessage && (
+        <div className="text-sm text-gray-600">
+          <span className="font-medium">Commit:</span> {event.payload.deployment.meta.githubCommitMessage}
+        </div>
+      )}
       
       {(event.url || event.meta?.deploymentUrl) && (
         <div className="mt-3">
@@ -138,7 +158,7 @@ export default function EventCard({ event }: EventCardProps) {
             className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
           >
             Ver Deploy
-            <ExternalLinkerror className="w-4 h-4 ml-1" />
+            <ExternalLink className="w-4 h-4 ml-1" />
           </a>
         </div>
       )}
