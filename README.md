@@ -2,6 +2,8 @@
 
 Um sistema completo para receber e processar webhooks da Vercel, com armazenamento em MongoDB e expiração automática de eventos.
 
+A complete system to receive and process Vercel webhooks, with MongoDB storage and automatic event expiration.
+
 ## 📋 Índice
 
 - [Funcionalidades](#funcionalidades)

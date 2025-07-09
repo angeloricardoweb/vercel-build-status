@@ -123,16 +123,16 @@ export default function EventCard({ event }: EventCardProps) {
         </div>
       </div>
       
-      {event.deploymentId && (
+      {/* {event.deploymentId && (
         <div className="mt-3 text-sm text-gray-600">
           <span className="font-medium">Deploy ID:</span> {event.deploymentId}
         </div>
-      )}
+      )} */}
       
       {(event.url || event.meta?.deploymentUrl) && (
         <div className="mt-3">
           <a
-            href={event.url || event.meta?.deploymentUrl}
+            href={`https://${event.url}`}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
