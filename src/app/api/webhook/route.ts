@@ -129,13 +129,13 @@ export async function POST(request: NextRequest) {
     const event = JSON.parse(body);
     
     // Validar formato do evento conforme documentação Vercel
-    if (!event.id || !event.type || !event.createdAt || !event.payload || !event.region) {
-      console.error('Invalid event format');
-      return NextResponse.json(
-        { error: 'Invalid event format' },
-        { status: 400 }
-      );
-    }
+    // if (!event.id || !event.type || !event.createdAt || !event.payload || !event.region) {
+    //   console.error('Invalid event format');
+    //   return NextResponse.json(
+    //     { error: 'Invalid event format' },
+    //     { status: 400 }
+    //   );
+    // }
     
     // Extrair informações do evento
     const eventInfo = extractEventInfo(event);
