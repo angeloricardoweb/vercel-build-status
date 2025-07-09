@@ -138,7 +138,7 @@ export default function EventCard({ event }: EventCardProps) {
             className="inline-flex items-center text-sm text-blue-600 hover:text-blue-800"
           >
             Ver Deploy
-            <ExternalLink className="w-4 h-4 ml-1" />
+            <ExternalLinkerror className="w-4 h-4 ml-1" />
           </a>
         </div>
       )}
