@@ -15,13 +15,13 @@ function verifyBasicHeaders(req: any) {
   return true;
 }
 
-// Exemplo 2: Verificação de assinatura com SHA1 (como no seu exemplo)
+// Exemplo 2: Verificação de assinatura com SHA1 (conforme documentação Vercel)
 async function verifySignatureSHA1(req: any) {
-  console.log('\n=== Verificação de Assinatura SHA1 ===');
+  console.log('\n=== Verificação de Assinatura SHA1 (Vercel) ===');
   
   const payload = await req.text();
   const signature = crypto
-    .createHmac('sha1', process.env.WEBHOOK_SECRET || 'test_secret')
+    .createHmac('sha1', process.env.VERCEL_WEBHOOK_SECRET || 'test_secret')
     .update(payload)
     .digest('hex');
   
@@ -35,9 +35,9 @@ async function verifySignatureSHA1(req: any) {
   return signature === headerSignature;
 }
 
-// Exemplo 3: Verificação de assinatura com SHA256 (como no webhook atual)
+// Exemplo 3: Verificação de assinatura com SHA256 (alternativo)
 async function verifySignatureSHA256(req: any) {
-  console.log('\n=== Verificação de Assinatura SHA256 ===');
+  console.log('\n=== Verificação de Assinatura SHA256 (Alternativo) ===');
   
   const payload = await req.text();
   const signature = crypto
@@ -101,9 +101,9 @@ function verifyHeaderValues(req: any) {
   return true;
 }
 
-// Exemplo 6: Função completa de verificação
+// Exemplo 6: Função completa de verificação (conforme documentação Vercel)
 async function completeHeaderVerification(req: any) {
-  console.log('\n=== Verificação Completa de Headers ===');
+  console.log('\n=== Verificação Completa de Headers (Vercel) ===');
   
   try {
     // 1. Verificar se todos os headers necessários existem
@@ -116,8 +116,8 @@ async function completeHeaderVerification(req: any) {
       return { success: false, error: 'Valores de headers inválidos' };
     }
     
-    // 3. Verificar assinatura
-    const signatureValid = await verifySignatureSHA256(req);
+    // 3. Verificar assinatura com SHA1 (conforme documentação Vercel)
+    const signatureValid = await verifySignatureSHA1(req);
     if (!signatureValid) {
       return { success: false, error: 'Assinatura inválida' };
     }
@@ -131,7 +131,7 @@ async function completeHeaderVerification(req: any) {
 
 // Exemplo de uso
 async function demonstrateHeaderVerification() {
-  console.log('🔍 Exemplos de Verificação de Headers\n');
+  console.log('🔍 Exemplos de Verificação de Headers (Vercel)\n');
   
   // Simular uma requisição
   const mockRequest = {

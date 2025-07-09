@@ -3,10 +3,10 @@ import crypto from 'crypto';
 import connectDB from '@/lib/mongodb';
 import BuildEvent from '@/models/BuildEvent';
 
-// Função para verificar a assinatura do webhook
+// Função para verificar a assinatura do webhook (SHA1 conforme documentação Vercel)
 function verifySignature(payload: string, signature: string, secret: string): boolean {
   const expectedSignature = crypto
-    .createHmac('sha256', secret)
+    .createHmac('sha1', secret)
     .update(payload)
     .digest('hex');
   
@@ -16,7 +16,7 @@ function verifySignature(payload: string, signature: string, secret: string): bo
   );
 }
 
-// Função para extrair informações úteis do payload
+// Função para extrair informações úteis do payload conforme documentação Vercel
 function extractEventInfo(event: {
   id: string;
   type: string;
@@ -29,8 +29,9 @@ function extractEventInfo(event: {
   let projectId: string | undefined, deploymentId: string | undefined, status: string | undefined, url: string | undefined;
   let meta: Record<string, unknown> = {};
   
-  // Extrair informações baseadas no tipo de evento
+  // Extrair informações baseadas no tipo de evento conforme documentação Vercel
   switch (type) {
+    // Deployment Events
     case 'deployment.created':
     case 'deployment.succeeded':
     case 'deployment.error':
@@ -45,9 +46,12 @@ function extractEventInfo(event: {
         userId: typeof payload.userId === 'string' ? payload.userId : undefined,
         projectName: typeof payload.name === 'string' ? payload.name : undefined,
         deploymentUrl: typeof payload.url === 'string' ? payload.url : undefined,
+        target: typeof payload.target === 'string' ? payload.target : undefined,
+        alias: Array.isArray(payload.alias) ? payload.alias : undefined,
       };
       break;
     
+    // Project Events
     case 'project.created':
     case 'project.removed':
       projectId = typeof payload.id === 'string' ? payload.id : undefined;
@@ -55,14 +59,18 @@ function extractEventInfo(event: {
         teamId: typeof payload.teamId === 'string' ? payload.teamId : undefined,
         userId: typeof payload.userId === 'string' ? payload.userId : undefined,
         projectName: typeof payload.name === 'string' ? payload.name : undefined,
+        framework: typeof payload.framework === 'string' ? payload.framework : undefined,
       };
       break;
     
+    // Firewall Events
     case 'attack.detected':
       meta = {
         teamId: typeof payload.teamId === 'string' ? payload.teamId : undefined,
         attackType: typeof payload.attackType === 'string' ? payload.attackType : undefined,
         mitigated: typeof payload.mitigated === 'boolean' ? payload.mitigated : undefined,
+        ipAddress: typeof payload.ipAddress === 'string' ? payload.ipAddress : undefined,
+        userAgent: typeof payload.userAgent === 'string' ? payload.userAgent : undefined,
       };
       break;
   }
@@ -96,7 +104,7 @@ export async function POST(request: NextRequest) {
     // Obter o corpo da requisição
     const body = await request.text();
     
-    // Verificar a assinatura do webhook
+    // Verificar a assinatura do webhook (x-vercel-signature conforme documentação)
     const signature = request.headers.get('x-vercel-signature');
     if (!signature) {
       console.error('Missing x-vercel-signature header');
@@ -120,6 +128,15 @@ export async function POST(request: NextRequest) {
     // Parse do JSON
     const event = JSON.parse(body);
     
+    // Validar formato do evento conforme documentação Vercel
+    if (!event.id || !event.type || !event.createdAt || !event.payload || !event.region) {
+      console.error('Invalid event format');
+      return NextResponse.json(
+        { error: 'Invalid event format' },
+        { status: 400 }
+      );
+    }
+    
     // Extrair informações do evento
     const eventInfo = extractEventInfo(event);
     
@@ -127,11 +144,15 @@ export async function POST(request: NextRequest) {
     const buildEvent = new BuildEvent(eventInfo);
     await buildEvent.save();
 
-    console.log(`Event saved: ${eventInfo.type} - ${eventInfo.eventId}`);
+    console.log(`✅ Event saved: ${eventInfo.type} - ${eventInfo.eventId}`);
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ 
+      success: true,
+      eventId: eventInfo.eventId,
+      type: eventInfo.type
+    });
   } catch (error) {
-    console.error('Webhook error:', error);
+    console.error('❌ Webhook error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -143,6 +164,16 @@ export async function POST(request: NextRequest) {
 export async function GET() {
   return NextResponse.json({ 
     message: 'Vercel Build Status Webhook Endpoint',
-    status: 'active'
+    status: 'active',
+    supportedEvents: [
+      'deployment.created',
+      'deployment.succeeded', 
+      'deployment.error',
+      'deployment.cancelled',
+      'deployment.promoted',
+      'project.created',
+      'project.removed',
+      'attack.detected'
+    ]
   });
 } 

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-// Dados de exemplo para testar o webhook
+// Dados de exemplo para testar o webhook conforme documentação Vercel
 const testEvents = [
   {
     id: 'evt_test_deployment_created',
@@ -46,6 +46,32 @@ const testEvents = [
       status: 'error'
     },
     region: 'iad1'
+  },
+  {
+    id: 'evt_test_project_created',
+    type: 'project.created',
+    createdAt: new Date().toISOString(),
+    payload: {
+      id: 'prj_test789',
+      teamId: 'team_test123',
+      userId: 'user_test456',
+      name: 'New Test Project',
+      framework: 'nextjs'
+    },
+    region: 'iad1'
+  },
+  {
+    id: 'evt_test_attack_detected',
+    type: 'attack.detected',
+    createdAt: new Date().toISOString(),
+    payload: {
+      teamId: 'team_test123',
+      attackType: 'ddos',
+      mitigated: true,
+      ipAddress: '192.168.1.1',
+      userAgent: 'Mozilla/5.0 (compatible; BadBot/1.0)'
+    },
+    region: 'iad1'
   }
 ];
 
@@ -53,7 +79,7 @@ async function testWebhook() {
   const webhookUrl = process.env.WEBHOOK_URL || 'http://localhost:3000/api/webhook';
   const secret = process.env.VERCEL_WEBHOOK_SECRET || 'test_secret';
 
-  console.log('🧪 Testando webhook...');
+  console.log('🧪 Testando webhook conforme documentação Vercel...');
   console.log(`📍 URL: ${webhookUrl}`);
   console.log(`🔑 Secret: ${secret}`);
   console.log('');
@@ -61,8 +87,9 @@ async function testWebhook() {
   for (const event of testEvents) {
     try {
       const payload = JSON.stringify(event);
+      // Usar SHA1 conforme documentação oficial da Vercel
       const signature = crypto
-        .createHmac('sha256', secret)
+        .createHmac('sha1', secret)
         .update(payload)
         .digest('hex');
 
@@ -81,6 +108,9 @@ async function testWebhook() {
         console.log(`✅ ${event.type} - Sucesso`);
         console.log(`   Event ID: ${event.id}`);
         console.log(`   Status: ${response.status}`);
+        if (result.eventId) {
+          console.log(`   Saved Event ID: ${result.eventId}`);
+        }
       } else {
         console.log(`❌ ${event.type} - Erro`);
         console.log(`   Status: ${response.status}`);

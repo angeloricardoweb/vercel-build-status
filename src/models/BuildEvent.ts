@@ -15,6 +15,13 @@ export interface IBuildEvent extends Document {
     userId?: string;
     projectName?: string;
     deploymentUrl?: string;
+    target?: string;
+    alias?: string[];
+    framework?: string;
+    attackType?: string;
+    mitigated?: boolean;
+    ipAddress?: string;
+    userAgent?: string;
   };
 }
 
@@ -33,6 +40,13 @@ const BuildEventSchema: Schema = new Schema({
     userId: { type: String },
     projectName: { type: String },
     deploymentUrl: { type: String },
+    target: { type: String },
+    alias: [{ type: String }],
+    framework: { type: String },
+    attackType: { type: String },
+    mitigated: { type: Boolean },
+    ipAddress: { type: String },
+    userAgent: { type: String },
   },
 }, {
   timestamps: true,
@@ -44,5 +58,6 @@ BuildEventSchema.index({ createdAt: -1 });
 BuildEventSchema.index({ projectId: 1 });
 BuildEventSchema.index({ deploymentId: 1 });
 BuildEventSchema.index({ status: 1 });
+BuildEventSchema.index({ 'meta.teamId': 1 });
 
 export default mongoose.models.BuildEvent || mongoose.model<IBuildEvent>('BuildEvent', BuildEventSchema); 
