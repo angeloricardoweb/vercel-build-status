@@ -5,73 +5,99 @@ const testEvents = [
   {
     id: 'evt_test_deployment_created',
     type: 'deployment.created',
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
+    region: 'iad1',
     payload: {
-      id: 'dpl_test123',
-      projectId: 'prj_test456',
-      teamId: 'team_test789',
-      userId: 'user_test123',
-      name: 'Test Project',
-      url: 'https://test-project.vercel.app',
-      status: 'created'
-    },
-    region: 'iad1'
+      team: { id: 'team_test789' },
+      user: { id: 'user_test123' },
+      alias: ['test-project.vercel.app'],
+      deployment: {
+        id: 'dpl_test123',
+        url: 'https://test-project.vercel.app',
+        name: 'Test Project'
+      },
+      links: {
+        deployment: 'https://vercel.com/dashboard/deployment/dpl_test123',
+        project: 'https://vercel.com/dashboard/project/prj_test456'
+      },
+      target: 'production',
+      project: { id: 'prj_test456' },
+      plan: 'pro',
+      regions: ['iad1', 'gru1']
+    }
   },
   {
     id: 'evt_test_deployment_succeeded',
     type: 'deployment.succeeded',
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
+    region: 'iad1',
     payload: {
-      id: 'dpl_test123',
-      projectId: 'prj_test456',
-      teamId: 'team_test789',
-      userId: 'user_test123',
-      name: 'Test Project',
-      url: 'https://test-project.vercel.app',
-      status: 'succeeded'
-    },
-    region: 'iad1'
+      team: { id: 'team_test789' },
+      user: { id: 'user_test123' },
+      deployment: {
+        id: 'dpl_test123',
+        url: 'https://test-project.vercel.app',
+        name: 'Test Project'
+      },
+      links: {
+        deployment: 'https://vercel.com/dashboard/deployment/dpl_test123',
+        project: 'https://vercel.com/dashboard/project/prj_test456'
+      },
+      target: 'production',
+      project: { id: 'prj_test456' },
+      plan: 'pro',
+      regions: ['iad1', 'gru1']
+    }
   },
   {
     id: 'evt_test_deployment_error',
     type: 'deployment.error',
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
+    region: 'iad1',
     payload: {
-      id: 'dpl_test456',
-      projectId: 'prj_test789',
-      teamId: 'team_test123',
-      userId: 'user_test456',
-      name: 'Another Test Project',
-      url: 'https://another-test.vercel.app',
-      status: 'error'
-    },
-    region: 'iad1'
+      team: { id: 'team_test123' },
+      user: { id: 'user_test456' },
+      deployment: {
+        id: 'dpl_test456',
+        url: 'https://another-test.vercel.app',
+        name: 'Another Test Project'
+      },
+      links: {
+        deployment: 'https://vercel.com/dashboard/deployment/dpl_test456',
+        project: 'https://vercel.com/dashboard/project/prj_test789'
+      },
+      target: 'production',
+      project: { id: 'prj_test789' },
+      plan: 'pro',
+      regions: ['iad1']
+    }
   },
   {
     id: 'evt_test_project_created',
     type: 'project.created',
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
+    region: 'iad1',
     payload: {
-      id: 'prj_test789',
-      teamId: 'team_test123',
-      userId: 'user_test456',
-      name: 'New Test Project',
-      framework: 'nextjs'
-    },
-    region: 'iad1'
+      team: { id: 'team_test123' },
+      user: { id: 'user_test456' },
+      project: {
+        id: 'prj_test789',
+        name: 'New Test Project'
+      }
+    }
   },
   {
     id: 'evt_test_attack_detected',
     type: 'attack.detected',
-    createdAt: new Date().toISOString(),
+    createdAt: Date.now(),
+    region: 'iad1',
     payload: {
-      teamId: 'team_test123',
+      team: { id: 'team_test123' },
       attackType: 'ddos',
       mitigated: true,
       ipAddress: '192.168.1.1',
       userAgent: 'Mozilla/5.0 (compatible; BadBot/1.0)'
-    },
-    region: 'iad1'
+    }
   }
 ];
 
