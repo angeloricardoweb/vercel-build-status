@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import EventCard from '@/components/EventCard';
+import EventTimeline from '@/components/EventTimeline';
 // import EventFilters from '@/components/EventFilters';
 import { StatsGrid } from '@/components/StatsCard';
 import { RefreshCw, AlertCircle } from 'lucide-react';
@@ -161,7 +161,7 @@ export default function Dashboard() {
             )}
           </div>
 
-          <div className="p-6">
+          <div className="py-6">
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <RefreshCw className="w-6 h-6 animate-spin text-blue-600" />
@@ -178,11 +178,7 @@ export default function Dashboard() {
                 </p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {events.map((event) => (
-                  <EventCard key={event._id} event={event} />
-                ))}
-              </div>
+              <EventTimeline events={events} />
             )}
           </div>
 
