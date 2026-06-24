@@ -95,6 +95,10 @@ export default function Dashboard() {
     fetchEvents(pagination.page);
   };
 
+  const projectCountOnPage = new Set(
+    events.map((e) => e.meta?.projectName || e.projectId || 'sem-projeto')
+  ).size;
+
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -157,6 +161,9 @@ export default function Dashboard() {
             {pagination.total > 0 && (
               <p className="text-sm text-gray-600 mt-1">
                 {pagination.total} evento{pagination.total !== 1 ? 's' : ''} encontrado{pagination.total !== 1 ? 's' : ''}
+                {events.length > 0 && (
+                  <> · {projectCountOnPage} projeto{projectCountOnPage !== 1 ? 's' : ''} nesta página</>
+                )}
               </p>
             )}
           </div>

@@ -1,12 +1,44 @@
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, FolderGit2 } from 'lucide-react';
 import {
   TimelineEvent,
   getEventIcon,
   getEventTitle,
   getEventStyle,
 } from './eventMeta';
+
+function getProjectKey(event: TimelineEvent) {
+  return event.meta?.projectName || event.projectId || 'sem-projeto';
+}
+
+function getProjectLabel(event: TimelineEvent) {
+  return event.meta?.projectName || event.projectId || 'Projeto não identificado';
+}
+
+function groupEventsByProject(events: TimelineEvent[]) {
+  const groups = new Map<string, { label: string; events: TimelineEvent[] }>();
+
+  for (const event of events) {
+    const key = getProjectKey(event);
+    const existing = groups.get(key);
+
+    if (existing) {
+      existing.events.push(event);
+    } else {
+      groups.set(key, {
+        label: getProjectLabel(event),
+        events: [event],
+      });
+    }
+  }
+
+  return Array.from(groups.values()).sort((a, b) => {
+    const aLatest = new Date(a.events[0].createdAt).getTime();
+    const bLatest = new Date(b.events[0].createdAt).getTime();
+    return bLatest - aLatest;
+  });
+}
 
 function TimelineCard({ event }: { event: TimelineEvent }) {
   const style = getEventStyle(event.type);
@@ -24,9 +56,7 @@ function TimelineCard({ event }: { event: TimelineEvent }) {
         </h3>
       </div>
 
-      <p className="mt-1 text-xs font-medium text-gray-700 truncate">
-        {event.meta?.projectName || event.projectId || 'Projeto não identificado'}
-      </p>
+      <p className="mt-1 text-[11px] text-gray-400">{event.type}</p>
 
       {commit && (
         <p className="mt-1 text-xs text-gray-500 line-clamp-2">
@@ -49,24 +79,23 @@ function TimelineCard({ event }: { event: TimelineEvent }) {
   );
 }
 
-export default function EventTimeline({ events }: { events: TimelineEvent[] }) {
+function ProjectTimeline({ events }: { events: TimelineEvent[] }) {
   return (
-    <div className="overflow-x-auto pb-4">
+    <div className="overflow-x-auto pb-2">
       <div className="flex min-w-max items-stretch px-2">
         {events.map((event, index) => {
           const style = getEventStyle(event.type);
           const isTop = index % 2 === 0;
-          const time = format(new Date(event.createdAt), "dd/MM HH:mm", {
+          const time = format(new Date(event.createdAt), "dd 'de' MMMM 'às' HH:mm", {
             locale: ptBR,
           });
 
           return (
             <div
               key={event._id}
-              className="flex w-64 shrink-0 flex-col items-center"
+              className="flex w-56 shrink-0 flex-col items-center sm:w-64"
             >
-              {/* Slot superior */}
-              <div className="flex h-40 w-full items-end justify-center px-2 pb-2">
+              <div className="flex h-36 w-full items-end justify-center px-2 pb-2 sm:h-40">
                 {isTop && (
                   <div className="flex w-full flex-col items-center">
                     <TimelineCard event={event} />
@@ -75,7 +104,6 @@ export default function EventTimeline({ events }: { events: TimelineEvent[] }) {
                 )}
               </div>
 
-              {/* Eixo */}
               <div className="relative flex h-5 w-full items-center justify-center">
                 <div className="absolute inset-x-0 top-1/2 h-0.5 -translate-y-1/2 bg-gray-200" />
                 <div
@@ -83,13 +111,11 @@ export default function EventTimeline({ events }: { events: TimelineEvent[] }) {
                 />
               </div>
 
-              {/* Horário */}
-              <div className="mt-1 text-center text-[11px] font-medium text-gray-500">
+              <div className="mt-1 max-w-[10rem] text-center text-[11px] font-medium text-gray-500 sm:max-w-none">
                 {time}
               </div>
 
-              {/* Slot inferior */}
-              <div className="flex h-40 w-full items-start justify-center px-2 pt-2">
+              <div className="flex h-36 w-full items-start justify-center px-2 pt-2 sm:h-40">
                 {!isTop && (
                   <div className="flex w-full flex-col items-center">
                     <div className="h-3 w-px bg-gray-300" />
@@ -101,6 +127,37 @@ export default function EventTimeline({ events }: { events: TimelineEvent[] }) {
           );
         })}
       </div>
+    </div>
+  );
+}
+
+export default function EventTimeline({ events }: { events: TimelineEvent[] }) {
+  const projectGroups = groupEventsByProject(events);
+
+  return (
+    <div className="space-y-6">
+      {projectGroups.map((group) => (
+        <section
+          key={group.label}
+          className="rounded-lg border border-gray-200 bg-gray-50/50"
+        >
+          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 px-4 py-3 sm:px-6">
+            <div className="flex min-w-0 items-center gap-2">
+              <FolderGit2 className="h-5 w-5 shrink-0 text-gray-500" />
+              <h3 className="truncate text-base font-semibold text-gray-900 sm:text-lg">
+                {group.label}
+              </h3>
+            </div>
+            <span className="shrink-0 text-xs text-gray-500 sm:text-sm">
+              {group.events.length} evento{group.events.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+
+          <div className="px-2 py-4 sm:px-4">
+            <ProjectTimeline events={group.events} />
+          </div>
+        </section>
+      ))}
     </div>
   );
 }
